@@ -83,7 +83,49 @@ def index():
     return render_template("index.html", chat_history=chat_history)
 
 # This is the POST route for the chat. Adds the chat to the chat_history array and sends it to the assistant playground on openai
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json["message"]
+    
+    moderation_result = client.moderations.create(
+        input= user_input
+    )
+    while moderation_result.results[0].flagged == True:
+        moderation_result = client.moderations.create(
+        input = user_input
+    )
+        
+        chat_history.append({"role": "assistant", "content": user_input})
+        return jsonify(success=True, message="Assistant: Sorry, your message violated our community guidelines. Please try another prompt.")
+
+    chat_history.append({"role": "user", "content": user_input})    
+    
+    # Send to and receive messages from the assistant API
+    message_params = {"thread_id": thread_id, "role": "user", "content": user_input}
+    thread_message = client.beta.threads.messages.create(**message_params)
+    
+    # Get the message from the assistant
+    run = client.beta.threads.runs.create(
+        thread_id = thread_id,
+        assistant_id = assistant_id
+    )
+    
+    while run.status != "completed":
+        time.sleep(0.5)
+        run = client.beta.threads.runs.retrieve(thread_id = thread_id, run_id = run.id)
+    
+    thread_messages = client.beta.threads.messages.list(thread_id)
  
+    message = thread_messages.data[0].content[0].text.value
+ 
+    if run.status in ["cancelled", "failed", "expired"]:
+        message = "An error has occurred, please try again."
+ 
+    chat_history.append({"role": "assistant", "content": message})
+    
+    log_run(run.status)
+    return jsonify(success=True, message=message)
+    
     
 # Reset the chat
 @app.route("/reset", methods=["POST"])
