@@ -19,16 +19,36 @@ client = OpenAI()
 app = Flask(__name__)
 
 # Initialize the Assistant and Thread globally so all functions have access to the assistant_id and thread_id
+assistant_id = ""
+thread_id = ""
 
 
 # The array that will hold the chat history as the user and the assistant interact
+chat_history = [
+    {"role": "system", "content": "Hey there! How can I assist you with your learning today?"}
+]
 
-
-# Start by getting the assistant_id and thread_id and returning them
-
+# Getting the assistant_id and thread_id and returning them
+@app.route("/get_ids", methods=["GET"])
+def get_ids():
+    return jsonify(assistant_id=assistant_id, thread_id=thread_id)
 
 # If there is a message thread, send it to the the JavaScript using msg.role to render it to the UI. # # If there isn't a thread, return an error
-
+@app.route("/get_messages", methods=["GET"])
+def get_messages():
+    if thread_id != "":
+        thread_messages = client.beta.threads.messages.list(thread_id, order="asc")
+        messages = [
+            {
+                "role": msg.role,
+                "content": msg.content[0].text.value,
+            }
+            for msg in thread_messages.data
+        ]
+        
+        return jsonify(success=True, messages=messages)
+    else:
+        return jsonify(success=False, message="No thread ID")
 
 # Create the assistant
 # Use your assitant_id to retrieve your a assistant from the openai playground
