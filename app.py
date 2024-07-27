@@ -51,15 +51,13 @@ def get_messages():
         return jsonify(success=False, message="No thread ID")
 
 # Create the assistant
+# Use your assitant_id to retrieve your a assistant from the openai playground
+# Replace "asst_yournewassistantID" with your assistant ID
 def create_assistant():
     global assistant_id
     my_assistant = client.beta.assistants.retrieve(assistant_id= "asst_mCDrfJEbcgdaodV0rJYmvcrb")
     assistant_id = my_assistant.id
     return my_assistant
-
-# Use your assitant_id to retrieve your a assistant from the openai playground
-# Replace "asst_yournewassistantID" with your assistant ID
-
 
 # Create a thread if there isn't one
 def create_thread():
