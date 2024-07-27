@@ -1,13 +1,13 @@
 /* These are CSS variables. They allow you to change the theme of the chatbot by replacing the values. Read more about them here: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
 :root {
-  --header-background: #3352A1;
+  --header-background: #EAED94;
   --header-text-color: #FFFFFF;
   --default-background: #FFFFFF;
   --default-text-color: #000000;
   --user-block: #FFEBFF;
   --assistant-block: #FFFFFF;
   --borders: 1px solid #000000;
-  --border-input: 3px solid #2B6DEE;
+  --border-input: 3px solid #a83dfc;
   --border-radius: 15px;
   --placeholder-text-accents: #9E9C9C;
   --header-text-font-family: "Share Tech", sans-serif;
@@ -285,6 +285,7 @@ input[type="text"] {
   overflow: auto; 
   align-items: stretch;
   justify-content: center;
+  padding-bottom: 20px;
 }
 
 .messages {
